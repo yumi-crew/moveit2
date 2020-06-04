@@ -85,11 +85,17 @@ public:
   /// struct contains the the variables used for loading the planning pipeline
   struct PlanningPipelineOptions
   {
-    void load(const rclcpp::Node::SharedPtr& node)
+    void load(const rclcpp::Node::SharedPtr& node)                  
     {
+      // std::cout << "hei" << std::endl;
+      // std::cout << "*** PlanningPipelineOptions, Node name: "<< node->get_name() << "   , node namespace: " << node->get_namespace() << std::endl;
       const std::string ns = "planning_pipelines.";
-      node->get_parameter(ns + "pipeline_names", pipeline_names);
-      node->get_parameter(ns + "namespace", parent_namespace);
+      node->get_parameter(ns + "pipeline_names", pipeline_names);     
+      node->get_parameter(ns + "namespace", parent_namespace);        
+
+      // std::cout << "*** PlanningPipelineOptions , ns: " << ns << std::endl;
+      // std::cout << "*** PlanningPipelineOptions , parent_namespace: " << parent_namespace << std::endl;
+      // std::cout << "*** PlanningPipelineOptions , length of pipeline_names: " << pipeline_names.size() << std::endl;
     }
     std::vector<std::string> pipeline_names;
     std::string parent_namespace;
@@ -174,7 +180,7 @@ private:
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
   // Planning
-  std::map<std::string, planning_pipeline::PlanningPipelinePtr> planning_pipelines_;
+  std::map<std::string, planning_pipeline::PlanningPipelinePtr> planning_pipelines_; // is empty somehow
   std::map<std::string, std::set<std::string>> groups_pipelines_map_;
   std::map<std::string, std::set<std::string>> groups_algorithms_map_;
 

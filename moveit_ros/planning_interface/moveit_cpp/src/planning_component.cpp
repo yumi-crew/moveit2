@@ -54,6 +54,10 @@ static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit.ros_planning_int
 PlanningComponent::PlanningComponent(const std::string& group_name, const MoveItCppPtr& moveit_cpp)
   : node_(moveit_cpp->getNode()), moveit_cpp_(moveit_cpp), group_name_(group_name)
 {
+  std::cout << "/// entering PlanningComponent constructor" << std::endl;
+
+
+  std::cout << "/// before getJointModelGroup" << std::endl;
   joint_model_group_ = moveit_cpp_->getRobotModel()->getJointModelGroup(group_name);
   if (!joint_model_group_)
   {
@@ -62,6 +66,8 @@ PlanningComponent::PlanningComponent(const std::string& group_name, const MoveIt
     throw std::runtime_error(error);
   }
   planning_pipeline_names_ = moveit_cpp_->getPlanningPipelineNames(group_name);
+
+  std::cout << "/// successfully completed PlanningComponent construction" << std::endl;
 }
 
 PlanningComponent::PlanningComponent(const std::string& group_name, const rclcpp::Node::SharedPtr& node)
@@ -79,7 +85,7 @@ PlanningComponent::PlanningComponent(const std::string& group_name, const rclcpp
 
 PlanningComponent::~PlanningComponent()
 {
-  RCLCPP_INFO(LOGGER, "Deleting PlanningComponent '%s'", group_name_.c_str());
+  RCLCPP_INFO(LOGGER, "Deleting PlanningComponent '%s'", group_name_.c_str()); // here
   clearContents();
 }
 
@@ -276,27 +282,35 @@ bool PlanningComponent::setGoal(const std::vector<moveit_msgs::msg::Constraints>
   return true;
 }
 
-bool PlanningComponent::setGoal(const robot_state::RobotState& goal_state)
+bool PlanningComponent::setGoal(const robot_state::RobotState& goal_state)      //ok
 {
   current_goal_constraints_ = { kinematic_constraints::constructGoalConstraints(goal_state, joint_model_group_) };
   return true;
 }
 
-bool PlanningComponent::setGoal(const geometry_msgs::msg::PoseStamped& goal_pose, const std::string& link_name)
+bool PlanningComponent::setGoal(const geometry_msgs::msg::PoseStamped& goal_pose, const std::string& link_name)   //broken
 {
   current_goal_constraints_ = { kinematic_constraints::constructGoalConstraints(link_name, goal_pose) };
   return true;
 }
 
-bool PlanningComponent::setGoal(const std::string& goal_state_name)
+bool PlanningComponent::setGoal(const std::string& goal_state_name)  // ok
 {
-  const auto& named_targets = getNamedTargetStates();
-  if (std::find(named_targets.begin(), named_targets.end(), goal_state_name) == named_targets.end())
+  std::cout << "/// setGoal() entered"  << std::endl;
+
+  std::cout << "/// before getNamedTargetStates" << std::endl;
+  const auto& named_targets = getNamedTargetStates();           // named targets is empty, where is name_targets from?
+  std::cout << "/// length of named_targets : " << named_targets.size() << std::endl;
+  if (std::find(named_targets.begin(), named_targets.end(), goal_state_name) == named_targets.end())  // if cannot find the named target state
   {
-    RCLCPP_ERROR(LOGGER, "No predefined joint state found for target name '%s'", goal_state_name.c_str());
+    RCLCPP_ERROR(LOGGER, "No predefined joint state found for target name '%s'", goal_state_name.c_str());  // leaves here
     return false;
   }
+
+  std::cout << "/// before goal_state" << std::endl;
   robot_state::RobotState goal_state(moveit_cpp_->getRobotModel());
+
+  std::cout << "/// before setToDefaultValues" << std::endl;
   goal_state.setToDefaultValues(joint_model_group_, goal_state_name);
   return setGoal(goal_state);
 }

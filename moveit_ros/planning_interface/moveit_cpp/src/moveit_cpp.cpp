@@ -48,19 +48,20 @@ static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit.ros_planning_int
 constexpr char PLANNING_PLUGIN_PARAM[] = "planning_plugin";
 
 MoveItCpp::MoveItCpp(const rclcpp::Node::SharedPtr& node, const std::shared_ptr<tf2_ros::Buffer>& tf_buffer)
-  : MoveItCpp(node, Options(node), tf_buffer)
-{
-}
+  : MoveItCpp(node, Options(node), tf_buffer)  // her construeres en faulty Options
+{}
 
 MoveItCpp::MoveItCpp(const rclcpp::Node::SharedPtr& node, const Options& options,
                      const std::shared_ptr<tf2_ros::Buffer>& tf_buffer)
   : node_(node), tf_buffer_(tf_buffer)
 {
+  std::cout << "*** entering seconds constructor of MoveItCpp (proof)" << std::endl;
   if (!tf_buffer_)
     tf_buffer_ = std::make_shared<tf2_ros::Buffer>(node_->get_clock());
   tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
   // Configure planning scene monitor
+  std::cout << "*** before loadPlanningSceneMonitor" << std::endl;
   if (!loadPlanningSceneMonitor(options.planning_scene_monitor_options))
   {
     const std::string error = "Unable to configure planning scene monitor";
@@ -68,6 +69,7 @@ MoveItCpp::MoveItCpp(const rclcpp::Node::SharedPtr& node, const Options& options
     throw std::runtime_error(error);
   }
 
+  std::cout << "*** before getRobotModel" << std::endl;
   robot_model_ = planning_scene_monitor_->getRobotModel();
   if (!robot_model_)
   {
@@ -78,6 +80,7 @@ MoveItCpp::MoveItCpp(const rclcpp::Node::SharedPtr& node, const Options& options
   }
 
   bool load_planning_pipelines = true;
+  std::cout <<  "*** before loadPlanningPipelines" << std::endl;
   if (load_planning_pipelines && !loadPlanningPipelines(options.planning_pipeline_options))
   {
     const std::string error = "Failed to load planning pipelines from parameter server";
@@ -154,8 +157,13 @@ bool MoveItCpp::loadPlanningPipelines(const PlanningPipelineOptions& options)
 {
   // TODO(henningkayser): Use parent namespace for planning pipeline config lookup
   // ros::NodeHandle node_handle(options.parent_namespace.empty() ? "~" : options.parent_namespace);
+  std::cout << "<<< entering loadPlanningPipelines" << std::endl;
+  //std::cout << "<<< options.pipeline_names[0]: " << options.pipeline_names[0] << std::endl;
+  //std::cout << "<<< parent namespace of PlanningPipelineOptions (options) : " << options.parent_namespace << std::endl;
+  std::cout << "<<< after the prints, before the for-loop" << std::endl;
   for (const auto& planning_pipeline_name : options.pipeline_names)
   {
+    std::cout << "<<< planning_pipeline_name: " << planning_pipeline_name << std::endl;
     if (planning_pipelines_.count(planning_pipeline_name) > 0)
     {
       RCLCPP_WARN(LOGGER, "Skipping duplicate entry for planning pipeline '%s'.", planning_pipeline_name.c_str());
@@ -176,6 +184,7 @@ bool MoveItCpp::loadPlanningPipelines(const PlanningPipelineOptions& options)
 
   if (planning_pipelines_.empty())
   {
+    std::cout << "<<< planning_pipelines are empty" << std::endl;
     return false;
     RCLCPP_ERROR(LOGGER, "Failed to load any planning pipelines.");
   }

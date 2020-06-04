@@ -324,6 +324,8 @@ ompl_interface::ModelBasedPlanningContextPtr ompl_interface::PlanningContextMana
 
   // identify the correct planning configuration
   auto pc = planner_configs_.end();
+
+
   if (!req.planner_id.empty())
   {
     pc = planner_configs_.find(req.planner_id.find(req.group_name) == std::string::npos ?

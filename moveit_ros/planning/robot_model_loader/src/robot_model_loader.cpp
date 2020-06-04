@@ -114,7 +114,7 @@ void RobotModelLoader::configure(const Options& opt)
         rdf_loader_->getSRDF() ? rdf_loader_->getSRDF() : srdf::ModelSharedPtr(new srdf::Model());
     model_.reset(new robot_model::RobotModel(rdf_loader_->getURDF(), srdf));
   }
-
+ 
   if (model_ && !rdf_loader_->getRobotDescription().empty())
   {
     moveit::tools::Profiler::ScopedBlock prof_block2("RobotModelLoader::configure joint limits");
@@ -126,7 +126,7 @@ void RobotModelLoader::configure(const Options& opt)
       for (std::size_t joint_id = 0; joint_id < joint_limit.size(); ++joint_id)
       {
         std::string prefix =
-            rdf_loader_->getRobotDescription() + "_planning/joint_limits/" + joint_limit[joint_id].joint_name + "/";
+            rdf_loader_->getRobotDescription() + "_planning.joint_limits." + joint_limit[joint_id].joint_name + ".";    // M
 
         std::string param_name;
         try
@@ -215,7 +215,7 @@ void RobotModelLoader::loadKinematicsSolvers(const kinematics_plugin_loader::Kin
     std::copy(groups.begin(), groups.end(), std::ostream_iterator<std::string>(ss, " "));
     RCLCPP_DEBUG(LOGGER, "Loaded information about the following groups: '%s' ", ss.str().c_str());
     if (groups.empty() && !model_->getJointModelGroups().empty())
-      RCLCPP_WARN(LOGGER, "No kinematics plugins defined. Fill and load kinematics.yaml!");
+      RCLCPP_WARN(LOGGER, "No kinematics plugins defined. Fill and load kinematics.yaml!");    //her
 
     std::map<std::string, robot_model::SolverAllocatorFn> imap;
     for (const std::string& group : groups)

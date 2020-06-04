@@ -450,7 +450,7 @@ ompl::base::GoalPtr ompl_interface::ModelBasedPlanningContext::constructGoal()
   if (!goals.empty())
     return goals.size() == 1 ? goals[0] : ompl::base::GoalPtr(new GoalSampleableRegionMux(goals));
   else
-    RCLCPP_ERROR(LOGGER, "Unable to construct goal representation");
+    RCLCPP_ERROR(LOGGER, "Unable to construct goal representation");  
 
   return ob::GoalPtr();
 }

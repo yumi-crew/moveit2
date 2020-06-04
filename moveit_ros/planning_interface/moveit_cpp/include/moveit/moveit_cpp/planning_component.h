@@ -54,6 +54,8 @@ class PlanningComponent
 public:
   MOVEIT_STRUCT_FORWARD(PlanSolution)
 
+  MOVEIT_STRUCT_FORWARD(PlanRequestParameters) // (M)
+
   class MoveItErrorCode : public moveit_msgs::msg::MoveItErrorCodes
   {
   public:
@@ -114,7 +116,7 @@ public:
 
   /** \brief Constructor */
   PlanningComponent(const std::string& group_name, const rclcpp::Node::SharedPtr& node);
-  PlanningComponent(const std::string& group_name, const MoveItCppPtr& moveit_cpp);
+  PlanningComponent(const std::string& group_name, const MoveItCppPtr& moveit_cpp);  // calling this constructor
 
   /**
    * @brief This class owns unique resources (e.g. action clients, threads) and its not very
